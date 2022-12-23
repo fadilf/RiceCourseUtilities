@@ -4,14 +4,14 @@ if ($("#scheduleDetailsViewLink").length) {
 } else if ($("#newSummaryInfoLink").length) {
     $("#newSummaryInfoLink").click();
 } else {
-    alert("Try reloading the page and waiting a moment before using bookmarklet!");
+    alert("Try reloading the page and waiting a moment before using bookmarkvar!");
 }
 
 // Check if courses can be loaded (courses been registered and load successfully)
-let timeoutLength = 5; // (seconds)
-let checksDone = 0;
-let failed = null;
-let scheduleCheck = setInterval(function(){
+var timeoutLength = 5; // (seconds)
+var checksDone = 0;
+var failed = null;
+var scheduleCheck = setInterval(function(){
     if ($("#scheduleListView .listViewWrapper").length > 0) {
         scrape();
         clearInterval(scheduleCheck);
@@ -25,15 +25,15 @@ let scheduleCheck = setInterval(function(){
 
 // Start scraping each course
 function scrape() {
-    let courses = [];
+    var courses = [];
 
-    let courseNums = [];
+    var courseNums = [];
     $('tbody [xe-field="subjectCourseSectionNumber"]').each(function(){
         courseNums.push($(this).text().split(",")[0]);
     });
 
     $("#scheduleListView .listViewWrapper").each(function(index){
-        let course = {};
+        var course = {};
     
         // Easily scrapable info
         course["courseTitle"] = $(this).find(".section-details-link").text();
@@ -41,9 +41,9 @@ function scrape() {
         course["courseNum"] = courseNums[index];
     
         // Take raw html of section to parse meeting time info
-        let courseMeetingsRaw = $(this).find(".listViewMeetingInformation");
+        var courseMeetingsRaw = $(this).find(".listViewMeetingInformation");
         courseMeetingsRaw.each(function(){
-            let meetings = []
+            var meetings = []
             
             $(this).find(".meetingTimes").each(function(){
                 meetings.push({
@@ -60,12 +60,12 @@ function scrape() {
             });
     
             // Parse each meeting time line
-            let lines = $(this).html().split("<br>");
+            var lines = $(this).html().split("<br>");
             lines.pop(); // Remove extraneous line
             lines.forEach((line, index) => {
-                let el = document.createElement('html');
+                var el = document.createElement('html');
                 el.innerHTML = line;
-                let location = el.innerText.split("Building: ")[1].split(" Room: ");
+                var location = el.innerText.split("Building: ")[1].split(" Room: ");
                 meetings[index]["location"] = location;
             });
             
@@ -77,29 +77,29 @@ function scrape() {
     // Generate ICS file
     $.getScript("https://cdn.statically.io/gh/nwcell/ics.js/dfec67f3/ics.min.js").done(function(){
         $.getScript("https://cdn.statically.io/gh/nwcell/ics.js/dfec67f3/ics.deps.min.js").done(function(){
-            let cal = ics();
-            const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+            var cal = ics();
+            var weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
             // Add each course to calendar
             courses.forEach(course => {
                 course["meetings"].forEach(meetingTime => {
-                    let calTitle = `${course["courseNum"]}: ${course["courseTitle"]}`;
-                    let calDescription = `${course["courseCode"]} | Building: ${meetingTime["location"][0]} | Room: ${meetingTime["location"][1]}`;
-                    let calLocation = `${meetingTime["location"][0]}, Houston, TX`;
+                    var calTitle = `${course["courseNum"]}: ${course["courseTitle"]}`;
+                    var calDescription = `${course["courseCode"]} | Building: ${meetingTime["location"][0]} | Room: ${meetingTime["location"][1]}`;
+                    var calLocation = `${meetingTime["location"][0]}, Houston, TX`;
                     if (meetingTime["location"][0] == "None") {
                         calLocation = "None";
                     }
 
                     // Some "start dates" on Banner are actually delimiters and need to be adjusted accordingly
-                    let startDate = new Date(meetingTime["dateRange"][0]);
+                    var startDate = new Date(meetingTime["dateRange"][0]);
                     while (!meetingTime["days"].includes(weekday[startDate.getDay()])) {
                         startDate.setDate(startDate.getDate() + 1);
                     }
                     startDate = startDate.toLocaleDateString("en-US");
 
-                    let calFirstBegin = `${startDate} ${meetingTime["timeRange"][0]}`;
-                    let calFirstEnd = `${startDate} ${meetingTime["timeRange"][1]}`;
-                    let calRRule = {
+                    var calFirstBegin = `${startDate} ${meetingTime["timeRange"][0]}`;
+                    var calFirstEnd = `${startDate} ${meetingTime["timeRange"][1]}`;
+                    var calRRule = {
                         freq: "WEEKLY",
                         until: meetingTime["dateRange"][1],
                         interval: 1,
